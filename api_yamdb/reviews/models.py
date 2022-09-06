@@ -123,7 +123,7 @@ class Comment(models.Model):
         verbose_name='Дата добавления')
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name='comments',
-        verbose_name='Пост')
+        verbose_name='Отзыв')
 
     def __str__(self):
         return self.text

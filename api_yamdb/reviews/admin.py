@@ -21,7 +21,7 @@ class GenreAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'slug')
     empty_value_display = '-пусто-'
-    
+
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):

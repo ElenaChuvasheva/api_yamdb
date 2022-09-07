@@ -16,8 +16,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'reviews',
-    'users'
+    'users',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -92,3 +94,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+}

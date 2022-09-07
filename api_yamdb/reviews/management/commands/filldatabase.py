@@ -3,6 +3,7 @@ import datetime
 import os
 
 from django.conf import settings
+from django.core.management.base import BaseCommand
 
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CustomUser
@@ -21,10 +22,10 @@ def read_file(filename):
 def read_to_DB(filename, DBclass):
     reader = read_file(filename)
     for row in reader:
-        howto_create(DBclass, row)
+        create_object(DBclass, row)
 
 
-def howto_create(DBclass, row):
+def create_object(DBclass, row):
     if DBclass == CustomUser:
         kwargs = {'pk': int(row[0]), 'username': row[1], 'email': row[2],
                   'role': row[3]}
@@ -61,10 +62,13 @@ def addGenre(filename):
         genre.title_genre.add(title)
 
 
-read_to_DB('users.csv', CustomUser)
-read_to_DB('category.csv', Category)
-read_to_DB('genre.csv', Genre)
-read_to_DB('titles.csv', Title)
-addGenre('genre_title.csv')
-read_to_DB('review.csv', Review)
-read_to_DB('comments.csv', Comment)
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        read_to_DB('users.csv', CustomUser)
+        read_to_DB('category.csv', Category)
+        read_to_DB('genre.csv', Genre)
+        read_to_DB('titles.csv', Title)
+        addGenre('genre_title.csv')
+        read_to_DB('review.csv', Review)
+        read_to_DB('comments.csv', Comment)
+        print('база данных готова')

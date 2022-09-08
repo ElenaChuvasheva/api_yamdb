@@ -24,6 +24,12 @@ class IsAnonymous(permissions.BasePermission):
         return not request.user.is_authenticated
 
 
+class IsAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.role == CustomUser.ADMIN or request.user.is_superuser)
+
+
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
     Разрешение, позволяющее добавлять и удалять объекты

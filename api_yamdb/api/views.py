@@ -5,14 +5,17 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, serializers, status, viewsets
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import (filters, mixins, pagination, permissions,
+                            serializers, status, viewsets)
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .permissions import IsAdminOrReadOnly, IsAnonymous, IsEditorOrReadOnly
-from .serializers import (CommentSerializer, JWTTokenSerializer,
-                          ReviewSerializer)
+from .permissions import (IsAdmin, IsAdminOrReadOnly, IsAnonymous,
+                          IsEditorOrReadOnly)
+from .serializers import (CommentSerializer, CustomUserSerializer,
+                          JWTTokenSerializer, ReviewSerializer,
+                          SignupSerializer, UserEditSerializer)
 from api.filters import TitleFilter
 from api.serializers import (CategorySerializer, CustomUserSerializer,
                              GenreSerializer, SignupSerializer,
@@ -106,7 +109,35 @@ class CommentViewSet(viewsets.ModelViewSet):
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-    permission_classes = ()
+    lookup_field = "username"
+    permission_classes = (IsAdmin,)
+    pagination_class = pagination.PageNumberPagination
+
+    @action(
+        methods=[
+            "get",
+            "patch",
+        ],
+        detail=False,
+        url_path="me",
+        permission_classes=[permissions.IsAuthenticated],
+        serializer_class=UserEditSerializer,
+    )
+    def users_own_profile(self, request):
+        user = request.user
+        if request.method == "GET":
+            serializer = self.get_serializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == "PATCH":
+            serializer = self.get_serializer(
+                user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 def create_and_send_confirmation_code(username):

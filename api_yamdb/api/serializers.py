@@ -91,6 +91,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'role'
         )
 
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("username", "email", "first_name",
+                  "last_name", "bio", "role")
+        model = CustomUser
+        read_only_fields = ('role',)
+
 
 class SignupSerializer(serializers.ModelSerializer):
     username = serializers.CharField(

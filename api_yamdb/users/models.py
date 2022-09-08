@@ -45,7 +45,14 @@ class CustomUser(AbstractUser):
         default=USER
     )
 
+    class Meta:
+        ordering = ('id',)
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'    
+
     def save(self, *args, **kwargs):
+#        if self.role == self.ADMIN:
+#            self.is_staff = True
         if self.is_superuser:
             self.role = self.ADMIN
         super(CustomUser, self).save(*args, **kwargs)

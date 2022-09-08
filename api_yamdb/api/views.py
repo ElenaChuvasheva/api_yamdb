@@ -11,8 +11,8 @@ from .permissions import IsAdminOrReadOnly, IsAnonymous, IsEditorOrReadOnly
 from .serializers import (CommentSerializer, JWTTokenSerializer,
                           ReviewSerializer)
 from api.serializers import (CategorySerializer, CustomUserSerializer,
-                             SignupSerializer)
-from reviews.models import Category, Review, Title
+                             GenreSerializer, SignupSerializer)
+from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
 
@@ -31,6 +31,17 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+
+
+class GenreViewSet(CreateListDestroyViewSet):
+    """Вьюсет для выполнения операций с объектами модели Genre."""
+
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)

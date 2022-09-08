@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Category, Comment, Review
+from reviews.models import Category, Comment, Genre, Review
 from users.models import CustomUser
 
 
@@ -75,3 +75,11 @@ class SignupSerializer(serializers.ModelSerializer):
 class JWTTokenSerializer(serializers.Serializer):
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    """Сериалайзер для объектов модели Genre."""
+
+    class Meta:
+        fields = ["name", "slug", ]
+        model = Genre

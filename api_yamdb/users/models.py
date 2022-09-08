@@ -48,7 +48,8 @@ class CustomUser(AbstractUser):
     class Meta:
         ordering = ('id',)
         verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'    
+        verbose_name_plural = 'Пользователи' 
+
 
     def save(self, *args, **kwargs):
 #        if self.role == self.ADMIN:

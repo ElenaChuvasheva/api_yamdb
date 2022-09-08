@@ -34,12 +34,12 @@ class Category(models.Model):
 class Genre(models.Model):
     """Модель для создания жанров."""
     name = models.CharField(
-        verbose_name="Название категории",
+        verbose_name="Название жанра",
         max_length=256,
         unique=True,
     )
     slug = models.SlugField(
-        verbose_name="Адрес категории",
+        verbose_name="Адрес жанра",
         max_length=50,
         unique=True,
     )
@@ -47,6 +47,7 @@ class Genre(models.Model):
     class Meta:
         verbose_name = "Жанр"
         verbose_name_plural = "Жанры"
+        ordering = ('name', )
 
     def __str__(self):
         return self.name
@@ -83,7 +84,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = "Название произведения"
         verbose_name_plural = "Названия произведений"
-        ordering = ("-year",)
+        ordering = ('-year',)
 
     def __str__(self):
         return self.name

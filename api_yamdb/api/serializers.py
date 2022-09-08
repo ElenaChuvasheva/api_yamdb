@@ -36,7 +36,8 @@ class TitleSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ["name", "year", "genre", "category", ]
+        fields = '__all__'
+        # fields = ["name", "year", "genre", "category", ]
         model = Title
 
 

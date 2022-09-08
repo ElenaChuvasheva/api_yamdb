@@ -59,9 +59,9 @@ class GenreViewSet(CreateListDestroyViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для выполнения операция с объектами модели Title."""
 
-    queryset = Title.objects.annotate(
+    queryset = Title.objects.all().annotate(
         rating=Avg("reviews__score")
-    )
+    ).order_by('-year')
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter

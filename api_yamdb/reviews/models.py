@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from reviews.validators import validate_year
@@ -90,15 +91,20 @@ class Title(models.Model):
 class Review(models.Model):
     """Модель для отзыва."""
     text = models.TextField(verbose_name='Текст отзыва')
-    pub_date = models.DateTimeField(auto_now_add=True,
-                                    verbose_name='Дата публикации')
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата публикации'
+    )
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
                                related_name='reviews',
                                verbose_name='Автор')
     title = models.ForeignKey(Title, on_delete=models.CASCADE,
                               related_name='reviews',
                               verbose_name='Произведение')
-    score = models.IntegerField(verbose_name='Оценка')
+    score = models.IntegerField(
+        verbose_name='Оценка',
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
 
     def __str__(self):
         return self.text
@@ -106,6 +112,7 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        ordering = ('-pub_date',)
         constraints = (
             models.UniqueConstraint(fields=('author', 'title'),
                                     name='unique_author_title'),
@@ -120,7 +127,8 @@ class Comment(models.Model):
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата добавления')
+        verbose_name='Дата добавления'
+    )
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE, related_name='comments',
         verbose_name='Отзыв')
@@ -131,3 +139,4 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        ordering = ('-pub_date',)

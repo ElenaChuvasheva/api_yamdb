@@ -31,5 +31,5 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'text', 'pub_date', 'author', 'title')
+    list_display = ('pk', 'text', 'pub_date', 'author', 'score', 'title')
     empty_value_display = '-пусто-'

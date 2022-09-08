@@ -19,12 +19,6 @@ def read_file(filename):
     return reader
 
 
-def read_to_DB(filename, DBclass):
-    reader = read_file(filename)
-    for row in reader:
-        create_object(DBclass, row)
-
-
 def create_object(DBclass, row):
     if DBclass == CustomUser:
         kwargs = {'pk': int(row[0]), 'username': row[1], 'email': row[2],
@@ -62,7 +56,15 @@ def addGenre(filename):
         genre.title_genre.add(title)
 
 
+def read_to_DB(filename, DBclass):
+    reader = read_file(filename)
+    for row in reader:
+        create_object(DBclass, row)
+
+
 class Command(BaseCommand):
+    help = 'заполнение базы данных из csv файлов'
+
     def handle(self, *args, **options):
         read_to_DB('users.csv', CustomUser)
         read_to_DB('category.csv', Category)

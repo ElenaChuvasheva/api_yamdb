@@ -19,7 +19,7 @@ from users.models import CustomUser
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 #    def perform_create(self, serializer):
 #        serializer.save(author=self.request.user)
@@ -92,6 +92,7 @@ def get_auth_token(request):
     if not default_token_generator.check_token(
         user, request.data.get('confirmation_code')
     ):
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        err = 'Пароль не совпадает с отправленным на email'
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
     token = AccessToken.for_user(user)
     return Response({"token": str(token)}, status=status.HTTP_200_OK)

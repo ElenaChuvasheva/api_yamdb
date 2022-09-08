@@ -33,12 +33,13 @@ class CategoryViewSet(CreateListDestroyViewSet):
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ("name", )
+    search_fields = ('name',)
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    # http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = (IsEditorOrReadOnly,)
 
     def get_queryset(self):
@@ -54,7 +55,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    # http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = (IsEditorOrReadOnly,)
 
     def get_queryset(self):

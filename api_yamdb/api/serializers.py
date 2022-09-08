@@ -22,8 +22,8 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
-class TitleListSerializer(serializers.ModelSerializer):
-    """Сериалайзер для получения списка объектов модели Title."""
+class TitleSerializer(serializers.ModelSerializer):
+    """Сериалайзер для получения объекта модели Title."""    
 
     genre = SlugRelatedField(
         queryset=Genre.objects.all(),
@@ -40,10 +40,10 @@ class TitleListSerializer(serializers.ModelSerializer):
         model = Title
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    """Сериалайзер для получения объекта модели Title."""
+class TitleListSerializer(serializers.ModelSerializer):
+    """Сериалайзер для получения списка объектов модели Title."""
 
-    genre = GenreSerializer()
+    genre = GenreSerializer(many=True)
     category = CategorySerializer()
     rating = serializers.IntegerField(read_only=True, allow_null=True)
 

@@ -1,8 +1,16 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Comment, Review
+from reviews.models import Category, Comment, Review
 from users.models import CustomUser
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Сериалайзер для объектов модели Category."""
+
+    class Meta:
+        fields = ["name", "slug", ]
+        model = Category
 
 
 # не закончено из-за авторизации

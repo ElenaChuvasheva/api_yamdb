@@ -2,27 +2,45 @@ from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, serializers, status, viewsets
+from rest_framework import filters, mixins, serializers, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .permissions import IsAnonymous
+from .permissions import IsAdminOrReadOnly, IsAnonymous, IsEditorOrReadOnly
 from .serializers import (CommentSerializer, JWTTokenSerializer,
                           ReviewSerializer)
-from api.serializers import CustomUserSerializer, SignupSerializer
-from reviews.models import Review, Title
+from api.serializers import (CategorySerializer, CustomUserSerializer,
+                             SignupSerializer)
+from reviews.models import Category, Review, Title
 from users.models import CustomUser
 
 
-# не доделано - без авторизации толком не потестить
+class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                               mixins.DestroyModelMixin,
+                               viewsets.GenericViewSet):
+    """
+    Пользовательский класс вьюсета.
+    Создает и удаляет объект и возвращет список объектов.
+    """
+    pass
+
+
+class CategoryViewSet(CreateListDestroyViewSet):
+    """Вьюсет для выполнения операций с объектами модели Category."""
+
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly, )
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ("name", )
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    http_method_names = ['get', 'post', 'patch', 'delete']
-    permission_classes = (permissions.IsAuthenticated,)
+    # http_method_names = ['get', 'post', 'patch', 'delete']
+    permission_classes = (IsEditorOrReadOnly,)
 
-#    def perform_create(self, serializer):
-#        serializer.save(author=self.request.user)
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
@@ -30,13 +48,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        serializer.save(title=get_object_or_404(Title, pk=title_id))
+        serializer.save(author=self.request.user,
+                        title=get_object_or_404(Title, pk=title_id))
 
 
-# тоже не доделано из-за отсутствия авторизации
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    # http_method_names = ['get', 'post', 'patch', 'delete']
+    permission_classes = (IsEditorOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -47,7 +66,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
-        serializer.save(review=get_object_or_404(Review, pk=review_id))
+        serializer.save(author=self.request.user,
+                        review=get_object_or_404(Review, pk=review_id))
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):

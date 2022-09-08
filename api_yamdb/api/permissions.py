@@ -1,9 +1,9 @@
 from rest_framework import permissions
 
+from users.models import CustomUser
 
-# возможно, не понадобится.
-# попало сюда из предыдущего проекта, лежит про запас
-class IsAuthorOrReadOnly(permissions.BasePermission):
+
+class IsEditorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -14,9 +14,24 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         return (
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
+            or request.user.role == CustomUser.ADMIN
+            or request.user.role == CustomUser.MODERATOR
         )
 
 
 class IsAnonymous(permissions.BasePermission):
     def has_permission(self, request, view):
         return not request.user.is_authenticated
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Разрешение, позволяющее добавлять и удалять объекты
+    только пользователям с правами администратора.
+    """
+
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.role == CustomUser.ADMIN

@@ -44,3 +44,8 @@ class CustomUser(AbstractUser):
         choices=ROLES,
         default=USER
     )
+
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.role = self.ADMIN
+        super(CustomUser, self).save(*args, **kwargs)

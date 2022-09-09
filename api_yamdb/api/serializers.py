@@ -54,8 +54,10 @@ class TitleListSerializer(serializers.ModelSerializer):
         model = Title
 
 
-# не закончено из-за авторизации
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(read_only=True,
+                                          slug_field='username')
+
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
@@ -65,12 +67,15 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Проверьте оценку!')
         return value
 
-#    def validate(self, data):
-#        current_user = self.context['request'].user
-#        if current_user.reviews:
-#            raise serializers.ValidationError(
-#                'Больше одного отзыва оставлять нельзя')
-#        return data
+    def validate(self, data):
+        current_user = self.context['request'].user
+        title_id = self.context['view'].kwargs.get('title_id')        
+        print(current_user.reviews.filter(title=title_id))
+        if (current_user.reviews.filter(title=title_id)
+            and self.context['request'].method == 'POST'):
+            raise serializers.ValidationError(
+                'Больше одного отзыва оставлять нельзя')
+        return data
 
 
 # не закончено из-за авторизации

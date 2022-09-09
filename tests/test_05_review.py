@@ -20,7 +20,7 @@ class Test05ReviewAPI:
 
     def create_review(self, client_user, title_id, text, score):
         data = {'text': text, 'score': score}
-        response = client_user.post(f'/api/v1/titles/{title_id}/reviews/', data=data)
+        response = client_user.post(f'/api/v1/titles/{title_id}/reviews/', data=data)        
         assert response.status_code == 201, (
             'Проверьте, что при POST запросе `/api/v1/titles/{title_id}/reviews/` '
             'с правильными данными возвращает статус 201, api доступен для любого аутентифицированного пользователя'

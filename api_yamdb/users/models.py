@@ -50,10 +50,10 @@ class CustomUser(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи' 
 
+    def __str__(self):
+        return self.username
 
     def save(self, *args, **kwargs):
-#        if self.role == self.ADMIN:
-#            self.is_staff = True
         if self.is_superuser:
             self.role = self.ADMIN
         super(CustomUser, self).save(*args, **kwargs)

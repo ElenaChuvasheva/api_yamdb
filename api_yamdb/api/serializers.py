@@ -37,7 +37,6 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
-        # fields = ["name", "year", "genre", "category", ]
         model = Title
 
 
@@ -108,6 +107,23 @@ class UserEditSerializer(serializers.ModelSerializer):
                   "last_name", "bio", "role")
         model = CustomUser
         read_only_fields = ('role',)
+
+
+class SignupExistingSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    email = serializers.EmailField()
+
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email')
+
+    def validate(self, data):
+        user = CustomUser.objects.get(username=data['username'])
+        if user.email != data['email']:
+            raise serializers.ValidationError(
+                'Неправильный email'
+            )
+        return data
 
 
 class SignupSerializer(serializers.ModelSerializer):

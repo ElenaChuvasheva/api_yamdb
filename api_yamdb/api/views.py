@@ -18,8 +18,9 @@ from .serializers import (CommentSerializer, CustomUserSerializer,
                           SignupSerializer, UserEditSerializer)
 from api.filters import TitleFilter
 from api.serializers import (CategorySerializer, CustomUserSerializer,
-                             GenreSerializer, SignupSerializer,
-                             TitleListSerializer, TitleSerializer)
+                             GenreSerializer, SignupExistingSerializer,
+                             SignupSerializer, TitleListSerializer,
+                             TitleSerializer)
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
@@ -140,7 +141,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-def create_and_send_confirmation_code(username):
+def send_confirmation_code(username):
     user = CustomUser.objects.get(username=username)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
@@ -154,12 +155,17 @@ def create_and_send_confirmation_code(username):
 @api_view(['POST'])
 @permission_classes([IsAnonymous])
 def signup(request):
-    serializer = SignupSerializer(data=request.data)
+    username = request.data.get('username')
+    user_exists = CustomUser.objects.filter(username=username).exists()
+    if user_exists:
+        serializer = SignupExistingSerializer(data=request.data)
+    else:
+        serializer = SignupSerializer(data=request.data)
     if not serializer.is_valid():
         raise serializers.ValidationError(serializer.errors)
-    serializer.save()
-    username = request.data.get('username')
-    create_and_send_confirmation_code(username)
+    if not user_exists:
+        serializer.save()
+    send_confirmation_code(username)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

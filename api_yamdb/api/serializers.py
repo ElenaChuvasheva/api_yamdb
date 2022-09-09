@@ -23,7 +23,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    """Сериалайзер для получения объекта модели Title."""    
+    """Сериалайзер для получения объекта модели Title."""
 
     genre = SlugRelatedField(
         queryset=Genre.objects.all(),
@@ -69,10 +69,12 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         current_user = self.context['request'].user
-        title_id = self.context['view'].kwargs.get('title_id')        
+        title_id = self.context['view'].kwargs.get('title_id')
         print(current_user.reviews.filter(title=title_id))
-        if (current_user.reviews.filter(title=title_id)
-            and self.context['request'].method == 'POST'):
+        if (
+            current_user.reviews.filter(title=title_id)
+            and self.context['request'].method == 'POST'
+        ):
             raise serializers.ValidationError(
                 'Больше одного отзыва оставлять нельзя')
         return data
@@ -81,6 +83,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
                                           slug_field='username')
+
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
@@ -97,6 +100,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'bio',
             'role'
         )
+
 
 class UserEditSerializer(serializers.ModelSerializer):
     class Meta:

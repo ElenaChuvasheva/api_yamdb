@@ -5,6 +5,7 @@ from .models import CustomUser
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'username', 'first_name',
+    list_display = ('pk', 'email', 'username', 'first_name',
                     'last_name', 'bio', 'role')
     list_editable = ('role',)
+    ordering = ('-pk',)

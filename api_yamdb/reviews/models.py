@@ -6,25 +6,25 @@ from users.models import CustomUser
 
 
 class Category(models.Model):
-    """
-    Модель для создания категорий (типов) произведений.
+
+    """Модель для создания категорий (типов) произведений
     («Фильмы», «Книги», «Музыка»).
     """
 
     name = models.CharField(
-        verbose_name="Название категории",
+        verbose_name='Название категории',
         max_length=256,
         unique=True,
     )
     slug = models.SlugField(
-        verbose_name="Адрес категории",
+        verbose_name='Адрес категории',
         max_length=50,
         unique=True,
     )
 
     class Meta:
-        verbose_name = "Категория"
-        verbose_name_plural = "Категории"
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
         ordering = ('name', )
 
     def __str__(self):
@@ -32,21 +32,23 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
+
     """Модель для создания жанров."""
+
     name = models.CharField(
-        verbose_name="Название жанра",
+        verbose_name='Название жанра',
         max_length=256,
         unique=True,
     )
     slug = models.SlugField(
-        verbose_name="Адрес жанра",
+        verbose_name='Адрес жанра',
         max_length=50,
         unique=True,
     )
 
     class Meta:
-        verbose_name = "Жанр"
-        verbose_name_plural = "Жанры"
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
         ordering = ('name', )
 
     def __str__(self):
@@ -54,36 +56,38 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
+
     """Модель для создания произведений, к которым пишут отзывы."""
+
     name = models.CharField(
-        verbose_name="Название произведения",
+        verbose_name='Название произведения',
         max_length=256,
     )
     year = models.PositiveSmallIntegerField(
-        verbose_name="Год выпуска",
+        verbose_name='Год выпуска',
         validators=[validate_year, ]
     )
     description = models.TextField(
-        verbose_name="Описание",
+        verbose_name='Описание',
         null=True,
         blank=True,
     )
     genre = models.ManyToManyField(
         Genre,
-        verbose_name="Жанр",
+        verbose_name='Жанр',
         related_name='title_genre',
     )
     category = models.ForeignKey(
         Category,
-        related_name="category",
-        verbose_name="Категория",
+        related_name='category',
+        verbose_name='Категория',
         on_delete=models.SET_NULL,
         null=True,
     )
 
     class Meta:
-        verbose_name = "Название произведения"
-        verbose_name_plural = "Названия произведений"
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
         ordering = ('-year',)
 
     def __str__(self):
@@ -91,7 +95,9 @@ class Title(models.Model):
 
 
 class Review(models.Model):
+
     """Модель для отзыва."""
+
     text = models.TextField(verbose_name='Текст отзыва')
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -108,9 +114,6 @@ class Review(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
 
-    def __str__(self):
-        return self.text
-
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
@@ -120,9 +123,14 @@ class Review(models.Model):
                                     name='unique_author_title'),
         )
 
+    def __str__(self):
+        return self.text
+
 
 class Comment(models.Model):
+
     """Модель для комментария к отзыву."""
+
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='comments',
         verbose_name='Автор')
@@ -135,10 +143,10 @@ class Comment(models.Model):
         Review, on_delete=models.CASCADE, related_name='comments',
         verbose_name='Отзыв')
 
-    def __str__(self):
-        return self.text
-
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         ordering = ('-pub_date',)
+
+    def __str__(self):
+        return self.text

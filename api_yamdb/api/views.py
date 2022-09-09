@@ -27,14 +27,17 @@ from users.models import CustomUser
 class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                                mixins.DestroyModelMixin,
                                viewsets.GenericViewSet):
+
     """
     Пользовательский класс вьюсета.
     Создает и удаляет объект и возвращет список объектов.
     """
+
     pass
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
+
     """Вьюсет для выполнения операций с объектами модели Category."""
 
     queryset = Category.objects.all()
@@ -46,6 +49,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
 
 class GenreViewSet(CreateListDestroyViewSet):
+
     """Вьюсет для выполнения операций с объектами модели Genre."""
 
     queryset = Genre.objects.all()
@@ -57,24 +61,25 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+
     """Вьюсет для выполнения операция с объектами модели Title."""
 
     queryset = Title.objects.all().annotate(
-        rating=Avg("reviews__score")
+        rating=Avg('reviews__score')
     ).order_by('-year')
     permission_classes = (IsAdminOrReadOnly, )
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
+        if self.action in ('list', 'retrieve'):
             return TitleListSerializer
         return TitleSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsEditorOrReadOnly,)
 
     def get_queryset(self):
@@ -90,7 +95,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsEditorOrReadOnly,)
 
     def get_queryset(self):
@@ -109,26 +114,26 @@ class CommentViewSet(viewsets.ModelViewSet):
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-    lookup_field = "username"
+    lookup_field = 'username'
     permission_classes = (IsAdmin,)
     pagination_class = pagination.PageNumberPagination
 
     @action(
         methods=[
-            "get",
-            "patch",
+            'get',
+            'patch',
         ],
         detail=False,
-        url_path="me",
+        url_path='me',
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=UserEditSerializer,
     )
     def users_own_profile(self, request):
         user = request.user
-        if request.method == "GET":
+        if request.method == 'GET':
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == "PATCH":
+        if request.method == 'PATCH':
             serializer = self.get_serializer(
                 user,
                 data=request.data,
@@ -184,4 +189,4 @@ def get_auth_token(request):
         err = 'Пароль не совпадает с отправленным на email'
         return Response(err, status=status.HTTP_400_BAD_REQUEST)
     token = AccessToken.for_user(user)
-    return Response({"token": str(token)}, status=status.HTTP_200_OK)
+    return Response({'token': str(token)}, status=status.HTTP_200_OK)

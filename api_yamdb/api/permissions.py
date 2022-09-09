@@ -31,6 +31,7 @@ class IsAdmin(permissions.BasePermission):
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+
     """
     Разрешение, позволяющее добавлять и удалять объекты
     только пользователям с правами администратора.

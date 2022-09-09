@@ -7,32 +7,35 @@ from users.models import CustomUser
 
 
 class CategorySerializer(serializers.ModelSerializer):
+
     """Сериалайзер для объектов модели Category."""
 
     class Meta:
-        fields = ["name", "slug", ]
+        fields = ('name', 'slug')
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
+
     """Сериалайзер для объектов модели Genre."""
 
     class Meta:
-        fields = ["name", "slug", ]
+        fields = ("name", "slug",)
         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
+
     """Сериалайзер для получения объекта модели Title."""
 
     genre = SlugRelatedField(
         queryset=Genre.objects.all(),
-        slug_field="slug",
+        slug_field='slug',
         many=True,
     )
     category = SlugRelatedField(
         queryset=Category.objects.all(),
-        slug_field="slug",
+        slug_field='slug',
     )
 
     class Meta:
@@ -41,6 +44,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class TitleListSerializer(serializers.ModelSerializer):
+
     """Сериалайзер для получения списка объектов модели Title."""
 
     genre = GenreSerializer(many=True)
@@ -48,14 +52,16 @@ class TitleListSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True, allow_null=True)
 
     class Meta:
-        fields = ["id", "name", "year", "description", "rating", "genre",
-                  "category", ]
+        fields = ('id', 'name', 'year', 'description', 'rating', 'genre',
+                  'category')
         model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
                                           slug_field='username')
+
+    """Сериализатор для отзывов."""
 
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
@@ -83,6 +89,8 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
                                           slug_field='username')
 
+    """Сериализатор для комментариев."""
+
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
@@ -103,8 +111,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class UserEditSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ("username", "email", "first_name",
-                  "last_name", "bio", "role")
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
         model = CustomUser
         read_only_fields = ('role',)
 
@@ -137,7 +145,7 @@ class SignupSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
-                'нельзя создать пользователя с именем \'me\''
+                'Нельзя создать пользователя с именем \'me\''
             )
         return value
 

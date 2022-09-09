@@ -11,16 +11,15 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .permissions import (IsAdmin, IsAdminOrReadOnly, IsAnonymous,
-                          IsEditorOrReadOnly)
-from .serializers import (CommentSerializer, CustomUserSerializer,
-                          JWTTokenSerializer, ReviewSerializer,
-                          SignupSerializer, UserEditSerializer)
 from api.filters import TitleFilter
-from api.serializers import (CategorySerializer, CustomUserSerializer,
-                             GenreSerializer, SignupExistingSerializer,
-                             SignupSerializer, TitleListSerializer,
-                             TitleSerializer)
+from api.permissions import (IsAdmin, IsAdminOrReadOnly, IsAnonymous,
+                             IsEditorOrReadOnly)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             CustomUserSerializer, GenreSerializer,
+                             JWTTokenSerializer, ReviewSerializer,
+                             SignupExistingSerializer, SignupSerializer,
+                             TitleListSerializer, TitleSerializer,
+                             UserEditSerializer)
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 

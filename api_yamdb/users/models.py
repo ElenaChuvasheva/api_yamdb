@@ -7,11 +7,11 @@ class CustomUser(AbstractUser):
     ADMIN = 'admin'
     MODERATOR = 'moderator'
     USER = 'user'
-    ROLES = [
+    ROLES = (
         (ADMIN, 'Administrator'),
         (MODERATOR, 'Moderator'),
         (USER, 'User'),
-    ]
+    )
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -44,6 +44,14 @@ class CustomUser(AbstractUser):
         choices=ROLES,
         default=USER
     )
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
 
     class Meta:
         ordering = ('id',)

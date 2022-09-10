@@ -1,9 +1,10 @@
 from rest_framework import permissions
 
-from users.models import CustomUser
 
-
-class IsEditorOrReadOnly(permissions.BasePermission):
+class IsAuthorAdminModeratorOrReadOnly(permissions.BasePermission):
+    """Разрешение, позволяющее добавлять, удалять и редактировать объекты
+    только пользователям с правами администратора.
+    """
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -14,20 +15,18 @@ class IsEditorOrReadOnly(permissions.BasePermission):
         return (
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
-            or request.user.role == CustomUser.ADMIN
-            or request.user.role == CustomUser.MODERATOR
+            or request.user.is_admin
+            or request.user.is_moderator
         )
 
 
-class IsAnonymous(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return not request.user.is_authenticated
-
-
 class IsAdmin(permissions.BasePermission):
+    """Разрешение, позволяющее производить действия с объектами
+    только пользователям с правами администратора.
+    """
     def has_permission(self, request, view):
         return (request.user.is_authenticated
-                and request.user.role == CustomUser.ADMIN)
+                and request.user.is_admin)
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -38,12 +37,5 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return (
             request.method in permissions.SAFE_METHODS
             or request.user.is_authenticated
-            and request.user.role == CustomUser.ADMIN
-        )
-
-    def has_object_permission(self, request, view, obj):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated
-            and request.user.role == CustomUser.ADMIN
+            and request.user.is_admin
         )

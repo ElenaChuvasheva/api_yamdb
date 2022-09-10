@@ -9,8 +9,8 @@ from users.models import CustomUser
 class CategorySerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Category."""
     class Meta:
-        fields = ('name', 'slug')
         model = Category
+        fields = ('name', 'slug')
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -54,8 +54,8 @@ class ReviewSerializer(serializers.ModelSerializer):
                                           slug_field='username')
     """Сериализатор для отзывов."""
     class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
     def validate_score(self, value):
         if value > 10 or value <= 0:
@@ -79,8 +79,8 @@ class CommentSerializer(serializers.ModelSerializer):
                                           slug_field='username')
     """Сериализатор для комментариев."""
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -111,14 +111,6 @@ class SignupExistingSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('username', 'email')
-
-    def validate(self, data):
-        user = CustomUser.objects.get(username=data['username'])
-        if user.email != data['email']:
-            raise serializers.ValidationError(
-                'Неправильный email'
-            )
-        return data
 
 
 class SignupSerializer(serializers.ModelSerializer):

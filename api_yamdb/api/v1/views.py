@@ -32,7 +32,7 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     """
 
 
-class GetPostTPatchDeleteViewSet(viewsets.ModelViewSet):
+class GetPostPatchDeleteViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'patch', 'delete')
 
 
@@ -56,7 +56,7 @@ class GenreViewSet(CreateListDestroyViewSet):
     lookup_field = 'slug'
 
 
-class TitleViewSet(GetPostTPatchDeleteViewSet):
+class TitleViewSet(GetPostPatchDeleteViewSet):
     """Вьюсет для выполнения операций с объектами модели Title."""
     queryset = Title.objects.all().annotate(
         rating=Avg('reviews__score')
@@ -71,7 +71,7 @@ class TitleViewSet(GetPostTPatchDeleteViewSet):
         return TitleSerializer
 
 
-class ReviewViewSet(GetPostTPatchDeleteViewSet):
+class ReviewViewSet(GetPostPatchDeleteViewSet):
     """Вьюсет для выполнения операций с объектами модели Review."""
     serializer_class = ReviewSerializer
     permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
@@ -87,7 +87,7 @@ class ReviewViewSet(GetPostTPatchDeleteViewSet):
                         title=get_object_or_404(Title, pk=title_id))
 
 
-class CommentViewSet(GetPostTPatchDeleteViewSet):
+class CommentViewSet(GetPostPatchDeleteViewSet):
     """Вьюсет для выполнения операций с объектами модели Comment."""
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorAdminModeratorOrReadOnly,)

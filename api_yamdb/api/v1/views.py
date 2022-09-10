@@ -7,12 +7,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, pagination, permissions,
                             serializers, status, viewsets)
 from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api.v1.filters import TitleFilter
-from api.v1.permissions import (IsAdmin, IsAdminOrReadOnly, IsAnonymous,
-                                IsEditorOrReadOnly)
+from api.v1.permissions import (IsAdmin, IsAdminOrReadOnly,
+                                IsAuthorAdminModeratorOrReadOnly)
 from api.v1.serializers import (CategorySerializer, CommentSerializer,
                                 CustomUserSerializer, GenreSerializer,
                                 JWTTokenSerializer, ReviewSerializer,
@@ -29,6 +30,10 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     """Пользовательский класс вьюсета.
     Создает и удаляет объект и возвращет список объектов.
     """
+
+
+class GetPostTPatchDeleteViewSet(viewsets.ModelViewSet):
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
@@ -51,7 +56,7 @@ class GenreViewSet(CreateListDestroyViewSet):
     lookup_field = 'slug'
 
 
-class TitleViewSet(viewsets.ModelViewSet):
+class TitleViewSet(GetPostTPatchDeleteViewSet):
     """Вьюсет для выполнения операций с объектами модели Title."""
     queryset = Title.objects.all().annotate(
         rating=Avg('reviews__score')
@@ -66,11 +71,10 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleSerializer
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
+class ReviewViewSet(GetPostTPatchDeleteViewSet):
     """Вьюсет для выполнения операций с объектами модели Review."""
     serializer_class = ReviewSerializer
-    http_method_names = ('get', 'post', 'patch', 'delete')
-    permission_classes = (IsEditorOrReadOnly,)
+    permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -83,11 +87,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
                         title=get_object_or_404(Title, pk=title_id))
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(GetPostTPatchDeleteViewSet):
     """Вьюсет для выполнения операций с объектами модели Comment."""
     serializer_class = CommentSerializer
-    http_method_names = ('get', 'post', 'patch', 'delete')
-    permission_classes = (IsEditorOrReadOnly,)
+    permission_classes = (IsAuthorAdminModeratorOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -149,10 +152,12 @@ def send_confirmation_code(username):
 
 
 @api_view(['POST'])
-@permission_classes([IsAnonymous])
+@permission_classes([AllowAny])
 def signup(request):
     username = request.data.get('username')
-    user_exists = CustomUser.objects.filter(username=username).exists()
+    email = request.data.get('email')
+    user_exists = CustomUser.objects.filter(
+        username=username, email=email).exists()
     if user_exists:
         serializer = SignupExistingSerializer(data=request.data)
     else:
@@ -166,7 +171,7 @@ def signup(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAnonymous])
+@permission_classes([AllowAny])
 def get_auth_token(request):
     serializer = JWTTokenSerializer(data=request.data)
     if not serializer.is_valid():

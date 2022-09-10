@@ -3,7 +3,7 @@ from rest_framework import permissions
 from users.models import CustomUser
 
 
-class IsEditorOrReadOnly(permissions.BasePermission):
+class IsAuthorAdminModeratorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -19,11 +19,6 @@ class IsEditorOrReadOnly(permissions.BasePermission):
         )
 
 
-class IsAnonymous(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return not request.user.is_authenticated
-
-
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.user.is_authenticated
@@ -35,13 +30,6 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     только пользователям с правами администратора.
     """
     def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated
-            and request.user.role == CustomUser.ADMIN
-        )
-
-    def has_object_permission(self, request, view, obj):
         return (
             request.method in permissions.SAFE_METHODS
             or request.user.is_authenticated

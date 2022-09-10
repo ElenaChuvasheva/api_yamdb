@@ -9,15 +9,15 @@ from users.models import CustomUser
 class CategorySerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Category."""
     class Meta:
-        fields = ('name', 'slug')
         model = Category
-
+        fields = ('name', 'slug')
+        
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Genre."""
     class Meta:
-        fields = ('name', 'slug',)
         model = Genre
+        fields = ('name', 'slug',)  
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -33,8 +33,8 @@ class TitleSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
         model = Title
+        fields = '__all__'  
 
 
 class TitleListSerializer(serializers.ModelSerializer):
@@ -44,10 +44,10 @@ class TitleListSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True, allow_null=True)
 
     class Meta:
+        model = Title
         fields = ('id', 'name', 'year', 'description', 'rating', 'genre',
                   'category')
-        model = Title
-
+        
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,

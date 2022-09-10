@@ -16,8 +16,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class GenreSerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Genre."""
     class Meta:
-        fields = ('name', 'slug',)
         model = Genre
+        fields = ('name', 'slug',)
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -33,8 +33,8 @@ class TitleSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
         model = Title
+        fields = '__all__'
 
 
 class TitleListSerializer(serializers.ModelSerializer):
@@ -44,9 +44,9 @@ class TitleListSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True, allow_null=True)
 
     class Meta:
+        model = Title
         fields = ('id', 'name', 'year', 'description', 'rating', 'genre',
                   'category')
-        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -86,21 +86,15 @@ class CommentSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role'
-        )
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
 
 
 class UserEditSerializer(serializers.ModelSerializer):
     class Meta:
+        model = CustomUser
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
-        model = CustomUser
         read_only_fields = ('role',)
 
 

@@ -24,6 +24,10 @@ class Category(models.Model):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
         ordering = ('name', )
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'slug'], name='name_slug_unique_ctg')
+        ]
 
     def __str__(self):
         return self.name
@@ -46,6 +50,10 @@ class Genre(models.Model):
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
         ordering = ('name', )
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'slug'], name='name_slug_unique_gnr')
+        ]
 
     def __str__(self):
         return self.name
@@ -59,6 +67,7 @@ class Title(models.Model):
     )
     year = models.PositiveSmallIntegerField(
         verbose_name='Год выпуска',
+        db_index=True,
         validators=[validate_year, ]
     )
     description = models.TextField(

@@ -4,6 +4,9 @@ from users.models import CustomUser
 
 
 class IsAuthorAdminModeratorOrReadOnly(permissions.BasePermission):
+    """Разрешение, позволяющее добавлять, удалять и редактировать объекты
+    только пользователям с правами администратора.
+    """
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS
@@ -20,6 +23,9 @@ class IsAuthorAdminModeratorOrReadOnly(permissions.BasePermission):
 
 
 class IsAdmin(permissions.BasePermission):
+    """Разрешение, позволяющее производить действия с объектами
+    только пользователям с правами администратора.
+    """
     def has_permission(self, request, view):
         return (request.user.is_authenticated
                 and request.user.role == CustomUser.ADMIN)

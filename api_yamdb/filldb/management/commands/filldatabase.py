@@ -1,6 +1,8 @@
 import csv
 import datetime
+import logging
 import os
+import sys
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -9,6 +11,12 @@ from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CustomUser
 
 CSV_DIR = os.path.join(settings.BASE_DIR, 'static', 'data')
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    stream=sys.stdout,
+)
 
 
 def read_file(filename):
@@ -34,7 +42,7 @@ def create_object(DBclass, row):
         kwargs = {'pk': int(row[0]),
                   'title': Title.objects.get(pk=int(row[1])),
                   'text': row[2],
-                  'author': CustomUser.objects.get(pk=int(row[3])),
+                  'author': (CustomUser.objects.get(pk=int(row[3]))),
                   'score': int(row[4]),
                   'pub_date': (datetime.datetime.
                                strptime(row[5], '%Y-%m-%dT%H:%M:%S.%fZ'))}
@@ -42,7 +50,7 @@ def create_object(DBclass, row):
         kwargs = {'pk': int(row[0]),
                   'review': Review.objects.get(pk=int(row[1])),
                   'text': row[2],
-                  'author': CustomUser.objects.get(pk=int(row[3])),
+                  'author': (CustomUser.objects.get(pk=int(row[3]))),
                   'pub_date': (datetime.datetime.
                                strptime(row[4], '%Y-%m-%dT%H:%M:%S.%fZ'))}
     DBclass.objects.create(**kwargs)
@@ -73,4 +81,4 @@ class Command(BaseCommand):
         addGenre('genre_title.csv')
         read_to_DB('review.csv', Review)
         read_to_DB('comments.csv', Comment)
-        print('база данных готова')
+        logging.info('база данных готова')

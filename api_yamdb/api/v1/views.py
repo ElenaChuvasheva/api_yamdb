@@ -1,4 +1,3 @@
-
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -11,15 +10,15 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from api.filters import TitleFilter
-from api.permissions import (IsAdmin, IsAdminOrReadOnly, IsAnonymous,
-                             IsEditorOrReadOnly)
-from api.serializers import (CategorySerializer, CommentSerializer,
-                             CustomUserSerializer, GenreSerializer,
-                             JWTTokenSerializer, ReviewSerializer,
-                             SignupExistingSerializer, SignupSerializer,
-                             TitleListSerializer, TitleSerializer,
-                             UserEditSerializer)
+from api.v1.filters import TitleFilter
+from api.v1.permissions import (IsAdmin, IsAdminOrReadOnly, IsAnonymous,
+                                IsEditorOrReadOnly)
+from api.v1.serializers import (CategorySerializer, CommentSerializer,
+                                CustomUserSerializer, GenreSerializer,
+                                JWTTokenSerializer, ReviewSerializer,
+                                SignupExistingSerializer, SignupSerializer,
+                                TitleListSerializer, TitleSerializer,
+                                UserEditSerializer)
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
@@ -27,19 +26,13 @@ from users.models import CustomUser
 class CreateListDestroyViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                                mixins.DestroyModelMixin,
                                viewsets.GenericViewSet):
-
-    """
-    Пользовательский класс вьюсета.
+    """Пользовательский класс вьюсета.
     Создает и удаляет объект и возвращет список объектов.
     """
 
-    pass
-
 
 class CategoryViewSet(CreateListDestroyViewSet):
-
     """Вьюсет для выполнения операций с объектами модели Category."""
-
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -49,9 +42,7 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
 
 class GenreViewSet(CreateListDestroyViewSet):
-
     """Вьюсет для выполнения операций с объектами модели Genre."""
-
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -61,9 +52,7 @@ class GenreViewSet(CreateListDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-
-    """Вьюсет для выполнения операция с объектами модели Title."""
-
+    """Вьюсет для выполнения операций с объектами модели Title."""
     queryset = Title.objects.all().annotate(
         rating=Avg('reviews__score')
     ).order_by('-year')
@@ -78,6 +67,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Вьюсет для выполнения операций с объектами модели Review."""
     serializer_class = ReviewSerializer
     http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsEditorOrReadOnly,)
@@ -94,21 +84,23 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для выполнения операций с объектами модели Comment."""
     serializer_class = CommentSerializer
     http_method_names = ('get', 'post', 'patch', 'delete')
     permission_classes = (IsEditorOrReadOnly,)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
-        get_object_or_404(Title, pk=title_id)
         review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, pk=review_id)
+        review = get_object_or_404(Review, title=title_id, pk=review_id)
         return review.comments.all()
 
     def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
         review_id = self.kwargs.get('review_id')
         serializer.save(author=self.request.user,
-                        review=get_object_or_404(Review, pk=review_id))
+                        review=get_object_or_404(Review, pk=review_id,
+                                                 title=title_id))
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):

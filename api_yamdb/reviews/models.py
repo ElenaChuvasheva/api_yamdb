@@ -6,11 +6,9 @@ from users.models import CustomUser
 
 
 class Category(models.Model):
-
     """Модель для создания категорий (типов) произведений
     («Фильмы», «Книги», «Музыка»).
     """
-
     name = models.CharField(
         verbose_name='Название категории',
         max_length=256,
@@ -32,9 +30,7 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-
     """Модель для создания жанров."""
-
     name = models.CharField(
         verbose_name='Название жанра',
         max_length=256,
@@ -56,9 +52,7 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-
     """Модель для создания произведений, к которым пишут отзывы."""
-
     name = models.CharField(
         verbose_name='Название произведения',
         max_length=256,
@@ -95,9 +89,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-
     """Модель для отзыва."""
-
     text = models.TextField(verbose_name='Текст отзыва')
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -128,9 +120,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-
     """Модель для комментария к отзыву."""
-
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='comments',
         verbose_name='Автор')

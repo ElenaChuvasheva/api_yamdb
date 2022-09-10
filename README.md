@@ -44,6 +44,10 @@ pip install -r requirements.txt
 ```
 python manage.py migrate
 ```
+Добавить в базу тестовые данные в случае необходимости:
+```
+python manage.py filldatabase
+```
 Запустить проект:
 ```
 python manage.py runserver

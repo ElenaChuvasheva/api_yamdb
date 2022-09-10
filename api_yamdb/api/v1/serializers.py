@@ -7,27 +7,21 @@ from users.models import CustomUser
 
 
 class CategorySerializer(serializers.ModelSerializer):
-
     """Сериалайзер для объектов модели Category."""
-
     class Meta:
         fields = ('name', 'slug')
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
-
     """Сериалайзер для объектов модели Genre."""
-
     class Meta:
-        fields = ("name", "slug",)
+        fields = ('name', 'slug',)
         model = Genre
 
 
 class TitleSerializer(serializers.ModelSerializer):
-
     """Сериалайзер для получения объекта модели Title."""
-
     genre = SlugRelatedField(
         queryset=Genre.objects.all(),
         slug_field='slug',
@@ -44,9 +38,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class TitleListSerializer(serializers.ModelSerializer):
-
     """Сериалайзер для получения списка объектов модели Title."""
-
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
     rating = serializers.IntegerField(read_only=True, allow_null=True)
@@ -60,9 +52,7 @@ class TitleListSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
                                           slug_field='username')
-
     """Сериализатор для отзывов."""
-
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
@@ -75,9 +65,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     def validate(self, data):
         current_user = self.context['request'].user
         title_id = self.context['view'].kwargs.get('title_id')
-        print(current_user.reviews.filter(title=title_id))
         if (
-            current_user.reviews.filter(title=title_id)
+            current_user.reviews.filter(title=title_id).exists()
             and self.context['request'].method == 'POST'
         ):
             raise serializers.ValidationError(
@@ -88,9 +77,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,
                                           slug_field='username')
-
     """Сериализатор для комментариев."""
-
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
         model = Comment

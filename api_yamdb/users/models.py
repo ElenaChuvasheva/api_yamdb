@@ -45,6 +45,14 @@ class CustomUser(AbstractUser):
         default=USER
     )
 
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR
+
     class Meta:
         ordering = ('id',)
         verbose_name = 'Пользователь'

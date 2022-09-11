@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 from reviews.validators import validate_year
 
@@ -97,7 +98,7 @@ class Review(models.Model):
     """Модель для отзыва."""
     text = models.TextField(verbose_name='Текст отзыва')
     pub_date = models.DateTimeField(
-        auto_now_add=True,
+        default=timezone.now(),
         verbose_name='Дата публикации'
     )
     author = models.ForeignKey(
@@ -146,7 +147,7 @@ class Comment(models.Model):
     )
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(
-        auto_now_add=True,
+        default=timezone.now(),
         verbose_name='Дата добавления'
     )
     review = models.ForeignKey(

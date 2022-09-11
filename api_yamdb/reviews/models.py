@@ -98,7 +98,7 @@ class Review(models.Model):
     """Модель для отзыва."""
     text = models.TextField(verbose_name='Текст отзыва')
     pub_date = models.DateTimeField(
-        default=timezone.now(),
+        default=timezone.now,
         verbose_name='Дата публикации'
     )
     author = models.ForeignKey(
@@ -147,7 +147,7 @@ class Comment(models.Model):
     )
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(
-        default=timezone.now(),
+        default=timezone.now,
         verbose_name='Дата добавления'
     )
     review = models.ForeignKey(

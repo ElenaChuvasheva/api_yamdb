@@ -8,16 +8,32 @@ from users.models import CustomUser
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Category."""
+
+    name = serializers.CharField(
+        validators=[UniqueValidator(queryset=Category.objects.all())]
+    )
+    slug = serializers.SlugField(
+        validators=[UniqueValidator(queryset=Category.objects.all())]
+    )
+
     class Meta:
         model = Category
         fields = ('name', 'slug')
-        
+
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Genre."""
+
+    name = serializers.CharField(
+        validators=[UniqueValidator(queryset=Genre.objects.all())]
+    )
+    slug = serializers.SlugField(
+        validators=[UniqueValidator(queryset=Genre.objects.all())]
+    )
+
     class Meta:
         model = Genre
-        fields = ('name', 'slug',)  
+        fields = ('name', 'slug',)
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -34,7 +50,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'  
+        fields = '__all__'
 
 
 class TitleListSerializer(serializers.ModelSerializer):
@@ -47,7 +63,7 @@ class TitleListSerializer(serializers.ModelSerializer):
         model = Title
         fields = ('id', 'name', 'year', 'description', 'rating', 'genre',
                   'category')
-        
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(read_only=True,

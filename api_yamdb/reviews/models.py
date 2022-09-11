@@ -16,7 +16,6 @@ class Category(models.Model):
     slug = models.SlugField(
         verbose_name='Адрес категории',
         max_length=50,
-        unique=True,
     )
 
     class Meta:
@@ -41,7 +40,6 @@ class Genre(models.Model):
     slug = models.SlugField(
         verbose_name='Адрес жанра',
         max_length=50,
-        unique=True,
     )
 
     class Meta:

@@ -4,8 +4,8 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (filters, mixins, pagination, permissions,
-                            serializers, status, viewsets)
+from rest_framework import (filters, mixins, permissions, serializers, status,
+                            viewsets)
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -18,8 +18,7 @@ from api.v1.serializers import (CategorySerializer, CommentSerializer,
                                 CustomUserSerializer, GenreSerializer,
                                 JWTTokenSerializer, ReviewSerializer,
                                 SignupExistingSerializer, SignupSerializer,
-                                TitleListSerializer, TitleSerializer,
-                                )
+                                TitleListSerializer, TitleSerializer)
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
@@ -127,14 +126,14 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(
                 current_user,
                 data=request.data,
-                partial=True 
+                partial=True
             )
             serializer.is_valid(raise_exception=True)
             if (
                 'role' in serializer.validated_data.keys()
                 and current_user.role != CustomUser.ADMIN
             ):
-                serializer.validated_data['role'] = current_user.role   
+                serializer.validated_data['role'] = current_user.role
                 serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -174,7 +173,7 @@ def signup(request):
 def get_auth_token(request):
     serializer = JWTTokenSerializer(data=request.data)
     if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     user = get_object_or_404(
         CustomUser,
         username=request.data.get('username')

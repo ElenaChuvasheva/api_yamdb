@@ -100,15 +100,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    """Сериализатор для юзеров."""
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
-        
-
 
 
 class SignupExistingSerializer(serializers.ModelSerializer):
+    """Сериализатор для аутинфекации существующих пользователей."""
     username = serializers.CharField()
     email = serializers.EmailField()
 
@@ -118,17 +118,27 @@ class SignupExistingSerializer(serializers.ModelSerializer):
 
 
 class SignupSerializer(serializers.ModelSerializer):
+    """Сериализатор для аутинфекации пользователей."""
     username = serializers.CharField(
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        validators=[UniqueValidator(
+            queryset=CustomUser.objects.all(),
+            message='Такой пользователь уже есть'
+        )]
     )
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
-    )
+    email = serializers.EmailField()
 
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
                 'Нельзя создать пользователя с именем \'me\''
+            )
+        return value
+
+    def validate_email(self, value):
+        value = value.lower()
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError(
+                'Пользователь с таким email уже зарегистрирован'
             )
         return value
 
@@ -138,5 +148,6 @@ class SignupSerializer(serializers.ModelSerializer):
 
 
 class JWTTokenSerializer(serializers.Serializer):
+    """Сериализатор для получения токена."""
     username = serializers.CharField()
     confirmation_code = serializers.CharField()

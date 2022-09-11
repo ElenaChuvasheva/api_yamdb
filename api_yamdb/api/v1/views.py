@@ -106,6 +106,7 @@ class CommentViewSet(GetPostPatchDeleteViewSet):
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
+    """Вьюсет для выполнения операций с объектами модели CustomUser."""
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     lookup_field = 'username'
@@ -118,6 +119,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def users_own_profile(self, request):
+        """Метод для работы пользователя с профилем."""
         current_user = request.user
         if request.method == 'GET':
             serializer = self.get_serializer(current_user)
@@ -139,6 +141,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
 
 def send_confirmation_code(username):
+    """Функция отправки кода подтверждения."""
     user = CustomUser.objects.get(username=username)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
@@ -152,6 +155,7 @@ def send_confirmation_code(username):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
+    """view-функция получения пользователем токена для API."""
     username = request.data.get('username')
     email = request.data.get('email')
     user_exists = CustomUser.objects.filter(
@@ -171,6 +175,7 @@ def signup(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_auth_token(request):
+    """Функция генерации и отправки токена."""
     serializer = JWTTokenSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -178,10 +183,11 @@ def get_auth_token(request):
         CustomUser,
         username=request.data.get('username')
     )
+    confirm_code = request.data.get('confirmation_code')
     if not default_token_generator.check_token(
-        user, request.data.get('confirmation_code')
+        user, confirm_code
     ):
-        err = f'Пароль не совпадает с отправленным на email '
+        err = f'Пароль не совпадает с отправленным на email {confirm_code}'
         return Response(err, status=status.HTTP_400_BAD_REQUEST)
     token = AccessToken.for_user(user)
     return Response({'token': str(token)}, status=status.HTTP_200_OK)

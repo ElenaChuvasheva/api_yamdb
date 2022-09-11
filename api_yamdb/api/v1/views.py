@@ -19,7 +19,7 @@ from api.v1.serializers import (CategorySerializer, CommentSerializer,
                                 JWTTokenSerializer, ReviewSerializer,
                                 SignupExistingSerializer, SignupSerializer,
                                 TitleListSerializer, TitleSerializer,
-                                UserEditSerializer)
+                                )
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
@@ -111,33 +111,32 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     lookup_field = 'username'
     permission_classes = (IsAdmin,)
-    pagination_class = pagination.PageNumberPagination
 
     @action(
-        methods=[
-            'get',
-            'patch',
-        ],
+        methods=['get', 'patch'],
         detail=False,
         url_path='me',
         permission_classes=[permissions.IsAuthenticated],
-        serializer_class=UserEditSerializer,
     )
     def users_own_profile(self, request):
-        user = request.user
+        current_user = request.user
         if request.method == 'GET':
-            serializer = self.get_serializer(user)
+            serializer = self.get_serializer(current_user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == 'PATCH':
+        else:
             serializer = self.get_serializer(
-                user,
+                current_user,
                 data=request.data,
-                partial=True
+                partial=True 
             )
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            if (
+                'role' in serializer.validated_data.keys()
+                and current_user.role != CustomUser.ADMIN
+            ):
+                serializer.validated_data['role'] = current_user.role   
+                serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 def send_confirmation_code(username):
@@ -175,7 +174,7 @@ def signup(request):
 def get_auth_token(request):
     serializer = JWTTokenSerializer(data=request.data)
     if not serializer.is_valid():
-        raise serializers.ValidationError(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
     user = get_object_or_404(
         CustomUser,
         username=request.data.get('username')
@@ -183,7 +182,7 @@ def get_auth_token(request):
     if not default_token_generator.check_token(
         user, request.data.get('confirmation_code')
     ):
-        err = 'Пароль не совпадает с отправленным на email'
+        err = f'Пароль не совпадает с отправленным на email '
         return Response(err, status=status.HTTP_400_BAD_REQUEST)
     token = AccessToken.for_user(user)
     return Response({'token': str(token)}, status=status.HTTP_200_OK)

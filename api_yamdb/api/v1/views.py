@@ -134,7 +134,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 and current_user.role != CustomUser.ADMIN
             ):
                 serializer.validated_data['role'] = current_user.role
-                serializer.save()
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 

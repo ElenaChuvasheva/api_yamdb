@@ -12,12 +12,10 @@ class Category(models.Model):
     name = models.CharField(
         verbose_name='Название категории',
         max_length=256,
-        unique=True,
     )
     slug = models.SlugField(
         verbose_name='Адрес категории',
         max_length=50,
-        unique=True,
     )
 
     class Meta:
@@ -38,12 +36,10 @@ class Genre(models.Model):
     name = models.CharField(
         verbose_name='Название жанра',
         max_length=256,
-        unique=True,
     )
     slug = models.SlugField(
         verbose_name='Адрес жанра',
         max_length=50,
-        unique=True,
     )
 
     class Meta:

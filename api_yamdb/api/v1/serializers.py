@@ -8,6 +8,14 @@ from users.models import CustomUser
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Category."""
+
+    name = serializers.CharField(
+        validators=[UniqueValidator(queryset=Category.objects.all())]
+    )
+    slug = serializers.SlugField(
+        validators=[UniqueValidator(queryset=Category.objects.all())]
+    )
+
     class Meta:
         model = Category
         fields = ('name', 'slug')
@@ -15,6 +23,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Genre."""
+
+    name = serializers.CharField(
+        validators=[UniqueValidator(queryset=Genre.objects.all())]
+    )
+    slug = serializers.SlugField(
+        validators=[UniqueValidator(queryset=Genre.objects.all())]
+    )
+
     class Meta:
         model = Genre
         fields = ('name', 'slug',)

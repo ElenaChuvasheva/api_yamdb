@@ -45,14 +45,6 @@ class CustomUser(AbstractUser):
         default=USER
     )
 
-    @property
-    def is_admin(self):
-        return self.role == self.ADMIN
-
-    @property
-    def is_moderator(self):
-        return self.role == self.MODERATOR
-
     class Meta:
         ordering = ('id',)
         verbose_name = 'Пользователь'
@@ -65,3 +57,11 @@ class CustomUser(AbstractUser):
         if self.is_superuser:
             self.role = self.ADMIN
         super(CustomUser, self).save(*args, **kwargs)
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR

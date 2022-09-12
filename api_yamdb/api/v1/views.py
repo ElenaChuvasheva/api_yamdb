@@ -125,17 +125,13 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(current_user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            serializer = self.get_serializer(
+            serializer = CustomUserSerializer(
                 current_user,
                 data=request.data,
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
-            if (
-                'role' in serializer.validated_data.keys()
-                and current_user.role != CustomUser.ADMIN
-            ):
-                serializer.validated_data['role'] = current_user.role
+            serializer.validated_data['role'] = current_user.role
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 

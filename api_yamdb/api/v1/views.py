@@ -153,9 +153,9 @@ def signup(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.data['username']
     email = serializer.data['email']
-    user = CustomUser.objects.get_or_create(
+    user, _ = CustomUser.objects.get_or_create(
         username=username, email=email
-    )[0]
+    )
     send_confirmation_code(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -2,6 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class LowerCaseEmailField(models.EmailField):
+    def get_prep_value(self, value):
+        return str(value).lower()
+
+
 class CustomUser(AbstractUser):
     """Кастомная модель User."""
     ADMIN = 'admin'
@@ -16,9 +21,9 @@ class CustomUser(AbstractUser):
         max_length=150,
         unique=True,
         blank=False,
-        verbose_name='Nickname пользователя'
+        verbose_name='Nickname пользователя',
     )
-    email = models.EmailField(
+    email = LowerCaseEmailField(
         unique=True,
         verbose_name='Адрес электронной почты'
     )
@@ -45,14 +50,6 @@ class CustomUser(AbstractUser):
         default=USER
     )
 
-    @property
-    def is_admin(self):
-        return self.role == self.ADMIN
-
-    @property
-    def is_moderator(self):
-        return self.role == self.MODERATOR
-
     class Meta:
         ordering = ('id',)
         verbose_name = 'Пользователь'
@@ -65,3 +62,11 @@ class CustomUser(AbstractUser):
         if self.is_superuser:
             self.role = self.ADMIN
         super(CustomUser, self).save(*args, **kwargs)
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == self.MODERATOR

@@ -131,12 +131,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
-            if (
-                'role' in serializer.validated_data.keys()
-                and current_user.role != CustomUser.ADMIN
-            ):
-                serializer.validated_data['role'] = current_user.role
-            serializer.save()
+            serializer.save(role=current_user.role)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -177,8 +172,7 @@ def signup(request):
 def get_auth_token(request):
     """Функция генерации и отправки токена."""
     serializer = JWTTokenSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         CustomUser,
         username=request.data.get('username')

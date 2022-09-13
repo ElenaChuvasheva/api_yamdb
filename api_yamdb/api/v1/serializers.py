@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
 
+from api.v1.validators import validate_username_not_me
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CustomUser
 
@@ -101,6 +102,19 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для юзеров."""
+    username = serializers.CharField(
+        validators=[UniqueValidator(
+            queryset=CustomUser.objects.all(),
+            message='Такой пользователь уже есть'
+        ), validate_username_not_me]
+    )
+    email = serializers.EmailField(
+        validators=[UniqueValidator(
+            queryset=CustomUser.objects.all(),
+            message='Пользователь с таким email уже зарегистрирован'
+        )]
+    )
+
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'first_name',
@@ -108,7 +122,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 class SignupExistingSerializer(serializers.ModelSerializer):
-    """Сериализатор для аутинфекации существующих пользователей."""
+    """Сериализатор для аутентификации существующих пользователей."""
     username = serializers.CharField()
     email = serializers.EmailField()
 
@@ -118,27 +132,24 @@ class SignupExistingSerializer(serializers.ModelSerializer):
 
 
 class SignupSerializer(serializers.ModelSerializer):
-    """Сериализатор для аутинфекации пользователей."""
+    """Сериализатор для работы с пользователями."""
     username = serializers.CharField(
         validators=[UniqueValidator(
             queryset=CustomUser.objects.all(),
             message='Такой пользователь уже есть'
         )]
     )
-    email = serializers.EmailField()
+    email = serializers.EmailField(
+        validators=[UniqueValidator(
+            queryset=CustomUser.objects.all(),
+            message='Пользователь с таким email уже зарегистрирован'
+        )]
+    )
 
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
                 'Нельзя создать пользователя с именем \'me\''
-            )
-        return value
-
-    def validate_email(self, value):
-        value = value.lower()
-        if CustomUser.objects.filter(email=value).exists():
-            raise serializers.ValidationError(
-                'Пользователь с таким email уже зарегистрирован'
             )
         return value
 

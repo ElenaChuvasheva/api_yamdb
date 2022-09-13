@@ -4,7 +4,7 @@ from django.db import models
 
 class LowerCaseEmailField(models.EmailField):
     def get_prep_value(self, value):
-        return str(value).lower()
+        return value.lower()
 
 
 class CustomUser(AbstractUser):

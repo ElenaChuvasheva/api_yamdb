@@ -6,6 +6,9 @@ from api.v1.validators import validate_username_not_me
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CustomUser
 
+err_username_message = 'Пользователь с таким именем уже есть'
+err_email_message = 'Пользователь с таким email уже зарегистрирован'
+
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Category."""
@@ -105,13 +108,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         validators=[UniqueValidator(
             queryset=CustomUser.objects.all(),
-            message='Такой пользователь уже есть'
+            message=err_username_message
         ), validate_username_not_me]
     )
     email = serializers.EmailField(
         validators=[UniqueValidator(
             queryset=CustomUser.objects.all(),
-            message='Пользователь с таким email уже зарегистрирован'
+            message=err_email_message
         )]
     )
 
@@ -121,41 +124,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
                   'last_name', 'bio', 'role')
 
 
-class SignupExistingSerializer(serializers.ModelSerializer):
-    """Сериализатор для аутентификации существующих пользователей."""
-    username = serializers.CharField()
+class SignupSerializer(serializers.Serializer):
+    """Сериализатор для работы с пользователями."""
+    username = serializers.CharField(validators=[validate_username_not_me])
     email = serializers.EmailField()
 
-    class Meta:
-        model = CustomUser
-        fields = ('username', 'email')
-
-
-class SignupSerializer(serializers.ModelSerializer):
-    """Сериализатор для работы с пользователями."""
-    username = serializers.CharField(
-        validators=[UniqueValidator(
-            queryset=CustomUser.objects.all(),
-            message='Такой пользователь уже есть'
-        )]
-    )
-    email = serializers.EmailField(
-        validators=[UniqueValidator(
-            queryset=CustomUser.objects.all(),
-            message='Пользователь с таким email уже зарегистрирован'
-        )]
-    )
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Нельзя создать пользователя с именем \'me\''
-            )
-        return value
-
-    class Meta:
-        model = CustomUser
-        fields = ('username', 'email')
+    def validate(self, data):
+        username_exists = CustomUser.objects.filter(
+            username=data['username']
+        ).exists()
+        email_exists = CustomUser.objects.filter(
+            email=data['email']
+        ).exists()
+        if username_exists and not email_exists:
+            raise serializers.ValidationError(err_username_message)
+        if email_exists and not username_exists:
+            raise serializers.ValidationError(err_email_message)
+        return data
 
 
 class JWTTokenSerializer(serializers.Serializer):

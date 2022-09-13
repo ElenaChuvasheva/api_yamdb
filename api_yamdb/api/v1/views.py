@@ -4,8 +4,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import (filters, mixins, permissions, serializers, status,
-                            viewsets)
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -17,8 +16,8 @@ from api.v1.permissions import (IsAdmin, IsAdminOrReadOnly,
 from api.v1.serializers import (CategorySerializer, CommentSerializer,
                                 CustomUserSerializer, GenreSerializer,
                                 JWTTokenSerializer, ReviewSerializer,
-                                SignupExistingSerializer, SignupSerializer,
-                                TitleListSerializer, TitleSerializer)
+                                SignupSerializer, TitleListSerializer,
+                                TitleSerializer)
 from reviews.models import Category, Genre, Review, Title
 from users.models import CustomUser
 
@@ -135,9 +134,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def send_confirmation_code(username):
+def send_confirmation_code(user):
     """Функция отправки кода подтверждения."""
-    user = CustomUser.objects.get(username=username)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         subject='Код подтверждения',
@@ -151,19 +149,14 @@ def send_confirmation_code(username):
 @permission_classes([AllowAny])
 def signup(request):
     """view-функция получения пользователем токена для API."""
-    username = request.data.get('username')
-    email = request.data.get('email')
-    user_exists = CustomUser.objects.filter(
-        username=username, email=email).exists()
-    if user_exists:
-        serializer = SignupExistingSerializer(data=request.data)
-    else:
-        serializer = SignupSerializer(data=request.data)
-    if not serializer.is_valid():
-        raise serializers.ValidationError(serializer.errors)
-    if not user_exists:
-        serializer.save()
-    send_confirmation_code(username)
+    serializer = SignupSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.data['username']
+    email = serializer.data['email']
+    user = CustomUser.objects.get_or_create(
+        username=username, email=email
+    )[0]
+    send_confirmation_code(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
